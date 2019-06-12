@@ -55,7 +55,7 @@ steps:
       $(Agent.JobName)
       $(CACHE_TYPE)
     path: '$(YARN_CACHE_FOLDER)'
-  condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], 'True'), ne(variables['PipelineCache.CacheRestoredYarnCache'], 'True')))
+  condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'True'), ne(variables['PipelineCache.CacheRestoredYarnCache'], 'True')))
 # - task: 1ESLighthouseEng.PipelineArtifactCaching.SaveCacheV1.SaveCache@1
 #   inputs:
 #     keyfile: '**/yarn.lock, !**/node_modules/**/yarn.lock, !**/.*/**/yarn.lock'
