@@ -11,7 +11,9 @@ steps:
     addToPath: true
 - task: RestoreCache@0
   inputs:
-    key: 'yarn.lock'
+    key: |
+      $(System.DefaultWorkingDirectory)/yarn.lock
+      $(Agent.OS)
     path: 'node_modules'
     cacheHitVar: 'CacheRestored'
 # - task: 1ESLighthouseEng.PipelineArtifactCaching.RestoreCacheV1.RestoreCache@1
@@ -25,7 +27,9 @@ steps:
   condition: ne(variables['CacheRestored'], 'true')
 - task: SaveCache@0
   inputs:
-    key: 'yarn.lock'
+    key: |
+      $(System.DefaultWorkingDirectory)/yarn.lock
+      $(Agent.OS)
     path: 'node_modules'
 # - task: 1ESLighthouseEng.PipelineArtifactCaching.SaveCacheV1.SaveCache@1
 #   inputs:
