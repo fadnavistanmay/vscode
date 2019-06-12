@@ -14,6 +14,7 @@ steps:
     key: |
       $(System.DefaultWorkingDirectory)/yarn.lock
       $(Agent.OS)
+      $(Agent.JobName)
     path: 'node_modules'
     cacheHitVar: 'CacheRestored'
 # - task: 1ESLighthouseEng.PipelineArtifactCaching.RestoreCacheV1.RestoreCache@1
@@ -30,6 +31,7 @@ steps:
     key: |
       $(System.DefaultWorkingDirectory)/yarn.lock
       $(Agent.OS)
+      $(Agent.JobName)
     path: 'node_modules'
   condition: and(succeeded(), and(ne(variables['USE_CACHE'], 'FALSE'), ne(variables['PipelineCache.CacheRestored'], 'True')))
 # - task: 1ESLighthouseEng.PipelineArtifactCaching.SaveCacheV1.SaveCache@1
