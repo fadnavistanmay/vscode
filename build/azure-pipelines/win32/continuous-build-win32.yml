@@ -96,11 +96,11 @@ steps:
 
 - bash: |
     set -x
-    mkdir $(System.DefaultWorkingDirectory)/PACKED_NODE_MODULES
-    cd $(System.DefaultWorkingDirectory)/node_modules
+    mkdir $(BASH_ROOT)/PACKED_NODE_MODULES
+    cd $(BASH_ROOT)/node_modules
     ls
-    tar -cf $(System.DefaultWorkingDirectory)/PACKED_NODE_MODULES/packed.tar .
-    ls -l $(System.DefaultWorkingDirectory)/PACKED_NODE_MODULES
+    tar -cf $(BASH_ROOT)/PACKED_NODE_MODULES/packed.tar .
+    ls -l $(BASH_ROOT)/PACKED_NODE_MODULES
   condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], 'TAR'), ne(variables['PipelineCache.CacheRestoredNodeModulesTar'], 'True')))
 - task: SaveCache@0
   inputs:
@@ -113,16 +113,16 @@ steps:
     path: 'PACKED_NODE_MODULES'
   condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], 'TAR'), ne(variables['PipelineCache.CacheRestoredNodeModulesTar'], 'True')))
 - bash: |
-    rm -Rf $(System.DefaultWorkingDirectory)/PACKED_NODE_MODULES
+    rm -Rf $(BASH_ROOT)/PACKED_NODE_MODULES
   condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], 'TAR'), ne(variables['PipelineCache.CacheRestoredNodeModulesTar'], 'True')))
 
 - bash: |
     set -x
-    mkdir $(System.DefaultWorkingDirectory)/PACKED_YARN_CACHE_FOLDER
+    mkdir $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
     cd $(BASH_YARN_CACHE_FOLDER)
     ls
-    tar -cf $(System.DefaultWorkingDirectory)/PACKED_YARN_CACHE_FOLDER/packed.tar .
-    ls -l $(System.DefaultWorkingDirectory)/PACKED_YARN_CACHE_FOLDER
+    tar -cf $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER/packed.tar .
+    ls -l $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
   condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'TAR'), ne(variables['PipelineCache.CacheRestoredYarnCacheTar'], 'True')))
 - task: SaveCache@0
   inputs:
@@ -135,7 +135,7 @@ steps:
     path: '$(YARN_CACHE_FOLDER)'
   condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'TAR'), ne(variables['PipelineCache.CacheRestoredYarnCache'], 'True')))
 - bash: |
-    rm -Rf $(System.DefaultWorkingDirectory)/PACKED_YARN_CACHE_FOLDER
+    rm -Rf $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
   condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'TAR'), ne(variables['PipelineCache.CacheRestoredYarnCacheTar'], 'True')))
 
 
