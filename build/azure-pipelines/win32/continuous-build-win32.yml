@@ -116,6 +116,17 @@ steps:
     rm -Rf $(BASH_ROOT)/PACKED_NODE_MODULES
   condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], 'TAR'), ne(variables['PipelineCache.CacheRestoredNodeModulesTar'], 'True')))
 
+- task: SaveCache@0
+  inputs:
+    key: |
+      $(System.DefaultWorkingDirectory)/yarn.lock
+      $(Agent.OS)
+      $(Agent.JobName)
+      CACHE_YARN=$(CACHE_YARN)
+      MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
+    path: '$(YARN_CACHE_FOLDER)'
+  condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'FILE'), ne(variables['PipelineCache.CacheRestoredYarnCache'], 'True')))
+
 - bash: |
     set -x
     mkdir $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
