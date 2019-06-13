@@ -21,6 +21,7 @@ jobs:
       yctar_nmtar:
         CACHE_YARN: TAR
         CACHE_NODE_MODULES: TAR
+        RUN_SALT: 1
   pool:
     vmImage: VS2017-Win2016
   steps:
