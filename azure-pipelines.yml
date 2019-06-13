@@ -1,5 +1,8 @@
 jobs:
 - job: Windows
+  variables:
+    MATRIX_SALT: 0
+    RUN_SALT: 0
   strategy:
     matrix:
       baseline: {}
