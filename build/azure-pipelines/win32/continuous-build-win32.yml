@@ -27,7 +27,7 @@ steps:
       $(System.DefaultWorkingDirectory)/yarn.lock
       $(Agent.OS)
       $(Agent.JobName)
-      CACHE_NODE_MODULES_TAR=$(CACHE_NODE_MODULES_TAR)
+      CACHE_NODE_MODULES=$(CACHE_NODE_MODULES)
     path: 'PACKED_NODE_MODULES'
     cacheHitVar: 'CacheRestoredNodeModulesTar'
   condition: and(succeeded(), eq(variables['CACHE_NODE_MODULES'], 'TAR'))
