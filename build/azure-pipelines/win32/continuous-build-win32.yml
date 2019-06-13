@@ -49,7 +49,7 @@ steps:
       CACHE_YARN=$(CACHE_YARN)
     path: '$(YARN_CACHE_FOLDER)'
     cacheHitVar: 'CacheRestoredYarnCache'
-  condition: and(succeeded(), eq(variables['CACHE_YARN'], 'True'))
+  condition: and(succeeded(), eq(variables['CACHE_YARN'], 'FILES'))
 
 - powershell: |
     yarn
