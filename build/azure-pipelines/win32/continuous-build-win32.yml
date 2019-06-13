@@ -15,7 +15,7 @@ steps:
       $(System.DefaultWorkingDirectory)/yarn.lock
       $(Agent.OS)
       $(Agent.JobName)
-      $(CACHE_TYPE)
+      CACHE_NODE_MODULES=$(CACHE_NODE_MODULES)
     path: 'node_modules'
     cacheHitVar: 'CacheRestoredNodeModules'
   condition: and(succeeded(), eq(variables['CACHE_NODE_MODULES'], 'True'))
@@ -25,7 +25,7 @@ steps:
       $(System.DefaultWorkingDirectory)/yarn.lock
       $(Agent.OS)
       $(Agent.JobName)
-      $(CACHE_TYPE)
+      CACHE_YARN=$(CACHE_YARN)
     path: '$(YARN_CACHE_FOLDER)'
     cacheHitVar: 'CacheRestoredYarnCache'
   condition: and(succeeded(), eq(variables['CACHE_YARN'], 'True'))
@@ -44,7 +44,7 @@ steps:
       $(System.DefaultWorkingDirectory)/yarn.lock
       $(Agent.OS)
       $(Agent.JobName)
-      $(CACHE_TYPE)
+      CACHE_NODE_MODULES=$(CACHE_NODE_MODULES)
     path: 'node_modules'
   condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], 'True'), ne(variables['PipelineCache.CacheRestoredNodeModules'], 'True')))
 - task: SaveCache@0
@@ -53,7 +53,7 @@ steps:
       $(System.DefaultWorkingDirectory)/yarn.lock
       $(Agent.OS)
       $(Agent.JobName)
-      $(CACHE_TYPE)
+      CACHE_YARN=$(CACHE_YARN)
     path: '$(YARN_CACHE_FOLDER)'
   condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'True'), ne(variables['PipelineCache.CacheRestoredYarnCache'], 'True')))
 # - task: 1ESLighthouseEng.PipelineArtifactCaching.SaveCacheV1.SaveCache@1
