@@ -1,32 +1,21 @@
 jobs:
-- job: Windows_baseline
-  pool:
-    vmImage: VS2017-Win2016
-  steps:
-  - template: build/azure-pipelines/win32/continuous-build-win32.yml
-
-- job: Windows_yc
-  variables:
-    CACHE_YARN: 'True'
-    YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
-  pool:
-    vmImage: VS2017-Win2016
-  steps:
-  - template: build/azure-pipelines/win32/continuous-build-win32.yml
-
-- job: Windows_nm
-  variables:
-    CACHE_NODE_MODULES: 'True'
-  pool:
-    vmImage: VS2017-Win2016
-  steps:
-  - template: build/azure-pipelines/win32/continuous-build-win32.yml
-
-- job: Windows_yc_nm
-  variables:
-    CACHE_YARN: 'True'
-    CACHE_NODE_MODULES: 'True'
-    YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
+- job: Windows
+  strategy:
+    matrix:
+      baseline: {}
+      yc:
+        CACHE_YARN: FILES
+        YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
+      nm:
+        CACHE_NODE_MODULES: FILES
+      yc_nm:
+        CACHE_YARN: FILES
+        CACHE_NODE_MODULES: FILES
+        YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
+      yctar_nmtar:
+        CACHE_YARN: TAR
+        CACHE_NODE_MODULES: TAR
+        YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
   pool:
     vmImage: VS2017-Win2016
   steps:
