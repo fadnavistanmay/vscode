@@ -11,9 +11,11 @@ jobs:
       baseline: {}
       yc:
         CACHE_YARN: FILES
+      yc_tar:
+        CACHE_YARN: TAR
       nm:
         CACHE_NODE_MODULES: FILES
-      tar:
+      nm_tar:
         CACHE_NODE_MODULES: TAR
       yc_nm:
         CACHE_YARN: FILES
