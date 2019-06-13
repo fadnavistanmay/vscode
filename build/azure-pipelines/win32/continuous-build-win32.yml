@@ -33,11 +33,12 @@ steps:
   condition: and(succeeded(), eq(variables['CACHE_NODE_MODULES'], 'TAR'))
 - bash: |
     set -x
+    ls -l ./PACKED_NODE_MODULES/*
     mkdir node_modules
     cd node_modules
     tar -xf ../PACKED_NODE_MODULES/packed.tar
-    cd ..
-    rm -Rf ./PACKED_NODE_MODULES
+    ls -l
+    rm -Rf ../PACKED_NODE_MODULES
   condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], 'TAR'), eq(variables['PipelineCache.CacheRestoredNodeModulesTar'], 'True')))
 
 - task: RestoreCache@0
@@ -70,7 +71,9 @@ steps:
     set -x
     mkdir PACKED_NODE_MODULES
     cd node_modules
+    ls
     tar -cf ../PACKED_NODE_MODULES/packed.tar *
+    ls -l ../PACKED_NODE_MODULES/*
   condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], 'TAR'), ne(variables['PipelineCache.CacheRestoredNodeModulesTar'], 'True')))
 - task: SaveCache@0
   inputs:
