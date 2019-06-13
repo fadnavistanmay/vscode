@@ -52,7 +52,7 @@ steps:
   condition: and(succeeded(), eq(variables['CACHE_YARN'], 'FILES'))
 
 - powershell: |
-    yarn
+    yarn --verbose
   displayName: Install Dependencies
   #condition: and(succeeded(), ne(variables['PipelineCache.CacheRestored'], 'True'))
 
