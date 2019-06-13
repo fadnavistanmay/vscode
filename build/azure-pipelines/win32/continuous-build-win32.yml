@@ -9,7 +9,9 @@ steps:
 #   inputs:
 #     versionSpec: '2.x'
 #     addToPath: true
-
+- bash: |
+    echo "##vso[task.setvariable variable=BASH_ROOT]$(pwd)"
+  displayName: set BASH_ROOT
 - task: RestoreCache@0
   inputs:
     key: |
@@ -35,12 +37,12 @@ steps:
   condition: and(succeeded(), eq(variables['CACHE_NODE_MODULES'], 'TAR'))
 - bash: |
     set -x
-    ls -l $(System.DefaultWorkingDirectory)/PACKED_NODE_MODULES
-    mkdir $(System.DefaultWorkingDirectory)/node_modules
-    cd $(System.DefaultWorkingDirectory)/node_modules
-    tar -xf $(System.DefaultWorkingDirectory)/PACKED_NODE_MODULES/packed.tar
+    ls -l $(BASH_ROOT)/PACKED_NODE_MODULES
+    mkdir $(BASH_ROOT)/node_modules
+    cd $(BASH_ROOT)/node_modules
+    tar -xf $(BASH_ROOT)/PACKED_NODE_MODULES/packed.tar
     ls -l
-    rm -Rf $(System.DefaultWorkingDirectory)/PACKED_NODE_MODULES
+    rm -Rf $(BASH_ROOT)/PACKED_NODE_MODULES
   condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], 'TAR'), eq(variables['PipelineCache.CacheRestoredNodeModulesTar'], 'True')))
 
 - task: RestoreCache@0
@@ -63,17 +65,17 @@ steps:
       $(Agent.JobName)
       CACHE_YARN=$(CACHE_YARN)
       MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
-    path: '$(System.DefaultWorkingDirectory)/PACKED_YARN_CACHE_FOLDER'
+    path: '$(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER'
     cacheHitVar: 'CacheRestoredYarnCacheTar'
   condition: and(succeeded(), eq(variables['CACHE_YARN'], 'TAR'))
 - bash: |
     set -x
-    ls -l $(System.DefaultWorkingDirectory)/PACKED_YARN_CACHE_FOLDER/*
-    mkdir $(YARN_CACHE_FOLDER)
-    cd $(YARN_CACHE_FOLDER)
-    tar -xf $(System.DefaultWorkingDirectory)/PACKED_YARN_CACHE_FOLDER/packed.tar
+    ls -l $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER/*
+    mkdir $(BASH_YARN_CACHE_FOLDER)
+    cd $(BASH_YARN_CACHE_FOLDER)
+    tar -xf $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER/packed.tar
     ls -l
-    rm -Rf $(System.DefaultWorkingDirectory)/PACKED_YARN_CACHE_FOLDER
+    rm -Rf $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
   condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'TAR'), eq(variables['PipelineCache.CacheRestoredYarnCacheTar'], 'True')))
 
 - powershell: |
@@ -117,7 +119,7 @@ steps:
 - bash: |
     set -x
     mkdir $(System.DefaultWorkingDirectory)/PACKED_YARN_CACHE_FOLDER
-    cd $(YARN_CACHE_FOLDER)
+    cd $(BASH_YARN_CACHE_FOLDER)
     ls
     tar -cf $(System.DefaultWorkingDirectory)/PACKED_YARN_CACHE_FOLDER/packed.tar .
     ls -l $(System.DefaultWorkingDirectory)/PACKED_YARN_CACHE_FOLDER

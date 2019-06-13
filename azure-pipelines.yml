@@ -3,22 +3,24 @@ jobs:
   variables:
     MATRIX_SALT: 0
     RUN_SALT: 0
+    YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
+    BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
+
   strategy:
     matrix:
       baseline: {}
       yc:
         CACHE_YARN: FILES
-        YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
       nm:
         CACHE_NODE_MODULES: FILES
+      tar:
+        CACHE_NODE_MODULES: TAR
       yc_nm:
         CACHE_YARN: FILES
         CACHE_NODE_MODULES: FILES
-        YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
       yctar_nmtar:
         CACHE_YARN: TAR
         CACHE_NODE_MODULES: TAR
-        YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
   pool:
     vmImage: VS2017-Win2016
   steps:
