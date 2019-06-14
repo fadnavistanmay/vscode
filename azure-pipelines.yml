@@ -5,6 +5,7 @@ jobs:
     RUN_SALT: 0
     YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
     BASH_YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
+    POOL: Hosted VS2017
   strategy:
     matrix:
       baseline:
