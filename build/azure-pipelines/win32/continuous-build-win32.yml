@@ -15,6 +15,9 @@ steps:
 
 - bash: |
     echo System.DefaultWorkingDirectory=$(System.DefaultWorkingDirectory)
+    echo SYSTEM_DEFAULTWORKINGDIRECTORY=$SYSTEM_DEFAULTWORKINGDIRECTORY
+    echo Pipeline.Workspace=$(Pipeline.Workspace)
+    echo PIPELINE_WORKSPACE=$PIPELINE_WORKSPACE
     echo MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
     echo YARN_CACHE_FOLDER=$(YARN_CACHE_FOLDER)
     echo BASH_YARN_CACHE_FOLDER=$(BASH_YARN_CACHE_FOLDER)
