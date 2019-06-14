@@ -5,43 +5,59 @@ jobs:
     RUN_SALT: 0
     YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
     BASH_YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
-    POOL: Hosted VS2017
   strategy:
     matrix:
       baseline:
+        POOL: Hosted VS2017
         BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
       yc:
+        POOL: Hosted VS2017
         BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
         CACHE_YARN: FILES
       yc_tar:
+        POOL: Hosted VS2017
         BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
         CACHE_YARN: TAR
       nm:
+        POOL: Hosted VS2017
         BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
         CACHE_NODE_MODULES: FILES
       nm_tar:
+        POOL: Hosted VS2017
         BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
         CACHE_NODE_MODULES: TAR
       yc_nm:
+        POOL: Hosted VS2017
         BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
         CACHE_YARN: FILES
         CACHE_NODE_MODULES: FILES
       yctar_nmtar:
+        POOL: Hosted VS2017
         BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
         CACHE_YARN: TAR
         CACHE_NODE_MODULES: TAR
-        RUN_SALT: 1
       linux_baseline:
         POOL: Hosted Ubuntu 1604
-        BASH_YARN_CACHE_FOLDER:
-      linux_nm:
-        CACHE_NODE_MODULES: FILES
+      linux_yc:
         POOL: Hosted Ubuntu 1604
-      osx_baseline:
-        POOL: Hosted macOS
-      osx_nm:
+        CACHE_YARN: FILES
+      linux_yc_tar:
+        POOL: Hosted Ubuntu 1604
+        CACHE_YARN: TAR
+      linux_nm:
+        POOL: Hosted Ubuntu 1604
         CACHE_NODE_MODULES: FILES
-        POOL: Hosted macOS
+      linux_nm_tar:
+        POOL: Hosted Ubuntu 1604
+        CACHE_NODE_MODULES: TAR
+      linux_yc_nm:
+        POOL: Hosted Ubuntu 1604
+        CACHE_YARN: FILES
+        CACHE_NODE_MODULES: FILES
+      linux_yctar_nmtar:
+        POOL: Hosted Ubuntu 1604
+        CACHE_YARN: TAR
+        CACHE_NODE_MODULES: TAR
   pool:
     name: $(POOL)
   steps:
