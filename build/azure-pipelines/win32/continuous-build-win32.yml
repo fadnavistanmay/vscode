@@ -14,6 +14,7 @@ steps:
   displayName: set BASH_ROOT
 
 - bash: |
+    echo System.DefaultWorkingDirectory=$(System.DefaultWorkingDirectory)
     echo MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
     echo YARN_CACHE_FOLDER=$(YARN_CACHE_FOLDER)
     echo BASH_YARN_CACHE_FOLDER=$(BASH_YARN_CACHE_FOLDER)
@@ -83,12 +84,13 @@ steps:
       $(Agent.JobName)
       CACHE_YARN=$(CACHE_YARN)
       MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
+      TIMES_FIXED_IN_YAML=1
     path: '$(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER'
     cacheHitVar: 'CacheRestoredYarnCacheTar'
   condition: and(succeeded(), eq(variables['CACHE_YARN'], 'TAR'))
 - bash: |
     set -x
-    ls -l $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER/*
+    ls -l $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
     mkdir $(BASH_YARN_CACHE_FOLDER)
     cd $(BASH_YARN_CACHE_FOLDER)
     tar -xf $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER/packed.tar
@@ -171,7 +173,8 @@ steps:
       $(Agent.JobName)
       CACHE_YARN=$(CACHE_YARN)
       MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
-    path: '$(YARN_CACHE_FOLDER)'
+      TIMES_FIXED_IN_YAML=1
+    path: '$(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER'
   condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'TAR'), ne(variables['PipelineCache.CacheRestoredYarnCacheTar'], 'True')))
 - bash: |
     rm -Rf $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
