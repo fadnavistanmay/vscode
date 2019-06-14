@@ -93,7 +93,7 @@ steps:
   condition: and(succeeded(), eq(variables['CACHE_YARN'], 'TAR'))
 - bash: |
     set -x
-    ls -l $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
+    ls -l PACKED_YARN_CACHE_FOLDER
     mkdir $(BASH_YARN_CACHE_FOLDER)
     cd $(BASH_YARN_CACHE_FOLDER)
     tar -xf $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER/packed.tar
