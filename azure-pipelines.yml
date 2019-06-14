@@ -58,9 +58,9 @@ jobs:
         POOL: Hosted Ubuntu 1604
         CACHE_YARN: TAR
         CACHE_NODE_MODULES: TAR
-      # jerick_baseline:
-      #   POOL: jerick-normal
-      #   BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
+      jerick_baseline:
+        POOL: jerick-normal
+        BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
       # jerick_yc:
       #   POOL: jerick-normal
       #   BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache

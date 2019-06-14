@@ -12,6 +12,12 @@ steps:
 - bash: |
     echo "##vso[task.setvariable variable=BASH_ROOT]$(pwd)"
   displayName: set BASH_ROOT
+- bash: |
+    if [ -d $(BASH_YARN_CACHE_FOLDER) ]; then rm -Rf $(BASH_YARN_CACHE_FOLDER); fi
+    if [ -d $(BASH_ROOT)/node_modules ]; then rm -Rf $(BASH_ROOT)/node_modules; fi
+  displayName: precleanup
+  condition: always()
+
 - task: RestoreCache@0
   inputs:
     key: |
@@ -79,7 +85,7 @@ steps:
   condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'TAR'), eq(variables['PipelineCache.CacheRestoredYarnCacheTar'], 'True')))
 
 - powershell: |
-    yarn --verbose --frozen-lockfile
+    yarn --verbose --frozen-lockfile 2>&1
   displayName: Install Dependencies
   #condition: and(succeeded(), ne(variables['PipelineCache.CacheRestored'], 'True'))
 
@@ -151,6 +157,7 @@ steps:
 
 - bash: |
     if [ -d $(BASH_YARN_CACHE_FOLDER) ]; then rm -Rf $(BASH_YARN_CACHE_FOLDER); fi
+    if [ -d $(BASH_ROOT)/node_modules ]; then rm -Rf $(BASH_ROOT)/node_modules; fi
   displayName: cleanup
   condition: always()
 
