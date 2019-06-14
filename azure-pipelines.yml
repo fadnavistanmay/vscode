@@ -1,11 +1,11 @@
 jobs:
 - job: vscode
   variables:
-    MATRIX_SALT: 0
+    MATRIX_SALT: 1
     RUN_SALT: 0
     YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
     BASH_YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
-    POOL: Hosted Windows 2019 with VS2019
+    POOL: Hosted VS2017
   strategy:
     matrix:
       baseline:

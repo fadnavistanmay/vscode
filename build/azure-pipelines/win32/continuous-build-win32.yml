@@ -79,7 +79,7 @@ steps:
   condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'TAR'), eq(variables['PipelineCache.CacheRestoredYarnCacheTar'], 'True')))
 
 - powershell: |
-    yarn --verbose
+    yarn --verbose --frozen-lockfile
   displayName: Install Dependencies
   #condition: and(succeeded(), ne(variables['PipelineCache.CacheRestored'], 'True'))
 
