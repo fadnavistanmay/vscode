@@ -98,7 +98,7 @@ steps:
     cd $(BASH_YARN_CACHE_FOLDER)
     tar -xf $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER/packed.tar
     ls -l
-    #rm -Rf $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
+    rm -Rf $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
   condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'TAR'), eq(variables['PipelineCache.CacheRestoredYarnCacheTar'], 'True')))
 
 - bash: |
@@ -177,7 +177,7 @@ steps:
       CACHE_YARN=$(CACHE_YARN)
       MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
       TIMES_FIXED_IN_YAML=1
-    path: '$(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER'
+    path: $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
   condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'TAR'), ne(variables['PipelineCache.CacheRestoredYarnCacheTar'], 'True')))
 - bash: |
     rm -Rf $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
