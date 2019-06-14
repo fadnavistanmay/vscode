@@ -125,7 +125,7 @@ steps:
       CACHE_YARN=$(CACHE_YARN)
       MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
     path: '$(YARN_CACHE_FOLDER)'
-  condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'FILE'), ne(variables['PipelineCache.CacheRestoredYarnCache'], 'True')))
+  condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'FILES'), ne(variables['PipelineCache.CacheRestoredYarnCache'], 'True')))
 
 - bash: |
     set -x
