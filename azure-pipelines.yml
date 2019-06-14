@@ -1,7 +1,7 @@
 jobs:
 - job: vscode
   variables:
-    MATRIX_SALT: 1
+    MATRIX_SALT: 2
     RUN_SALT: 0
     YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
     BASH_YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
