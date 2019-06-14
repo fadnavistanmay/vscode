@@ -85,13 +85,19 @@ steps:
   condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'TAR'), eq(variables['PipelineCache.CacheRestoredYarnCacheTar'], 'True')))
 
 - bash: |
-    if [ -d $(BASH_YARN_CACHE_FOLDER) ]; then ls -l $(BASH_YARN_CACHE_FOLDER); else echo $(BASH_YARN_CACHE_FOLDER) not found; fi
-  displayName: Check Yarn Cache folder
+    if [ -d $(BASH_YARN_CACHE_FOLDER) ]; then find $(BASH_YARN_CACHE_FOLDER); else echo $(BASH_YARN_CACHE_FOLDER) not found; fi
+    if [ -d $(BASH_ROOT)/node_modules ]; then find $(BASH_ROOT)/node_modules; else echo $(BASH_ROOT)/node_modules not found; fi
+  displayName: Check folder before
 
 - powershell: |
     yarn --verbose --frozen-lockfile
   displayName: Install Dependencies
   #condition: and(succeeded(), ne(variables['PipelineCache.CacheRestored'], 'True'))
+
+- bash: |
+    if [ -d $(BASH_YARN_CACHE_FOLDER) ]; then find $(BASH_YARN_CACHE_FOLDER); else echo $(BASH_YARN_CACHE_FOLDER) not found; fi
+    if [ -d $(BASH_ROOT)/node_modules ]; then find $(BASH_ROOT)/node_modules; else echo $(BASH_ROOT)/node_modules not found; fi
+  displayName: Check folders after
 
 - task: SaveCache@0
   inputs:
