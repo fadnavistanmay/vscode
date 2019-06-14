@@ -84,6 +84,10 @@ steps:
     rm -Rf $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
   condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'TAR'), eq(variables['PipelineCache.CacheRestoredYarnCacheTar'], 'True')))
 
+- bash: |
+    if [ -d $(BASH_YARN_CACHE_FOLDER) ]; then ls -l $(BASH_YARN_CACHE_FOLDER); else echo $(BASH_YARN_CACHE_FOLDER) not found; fi
+  displayName: Check Yarn Cache folder
+
 - powershell: |
     yarn --verbose --frozen-lockfile
   displayName: Install Dependencies
