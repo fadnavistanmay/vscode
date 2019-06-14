@@ -1,23 +1,96 @@
 jobs:
-- job: Windows
+- job: vscode
+  variables:
+    MATRIX_SALT: 2
+    RUN_SALT: 0
+    YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
+    BASH_YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
   strategy:
     matrix:
-      baseline: {}
+      baseline:
+        POOL: Hosted VS2017
+        BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
       yc:
+        POOL: Hosted VS2017
+        BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
         CACHE_YARN: FILES
-        YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
+      yc_tar:
+        POOL: Hosted VS2017
+        BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
+        CACHE_YARN: TAR
       nm:
+        POOL: Hosted VS2017
+        BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
         CACHE_NODE_MODULES: FILES
+      nm_tar:
+        POOL: Hosted VS2017
+        BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
+        CACHE_NODE_MODULES: TAR
       yc_nm:
+        POOL: Hosted VS2017
+        BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
         CACHE_YARN: FILES
         CACHE_NODE_MODULES: FILES
-        YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
       yctar_nmtar:
+        POOL: Hosted VS2017
+        BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
         CACHE_YARN: TAR
         CACHE_NODE_MODULES: TAR
-        YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
+
+      linux_baseline:
+        POOL: Hosted Ubuntu 1604
+      linux_yc:
+        POOL: Hosted Ubuntu 1604
+        CACHE_YARN: FILES
+      linux_yc_tar:
+        POOL: Hosted Ubuntu 1604
+        CACHE_YARN: TAR
+      linux_nm:
+        POOL: Hosted Ubuntu 1604
+        CACHE_NODE_MODULES: FILES
+      linux_nm_tar:
+        POOL: Hosted Ubuntu 1604
+        CACHE_NODE_MODULES: TAR
+      linux_yc_nm:
+        POOL: Hosted Ubuntu 1604
+        CACHE_YARN: FILES
+        CACHE_NODE_MODULES: FILES
+      linux_yctar_nmtar:
+        POOL: Hosted Ubuntu 1604
+        CACHE_YARN: TAR
+        CACHE_NODE_MODULES: TAR
+
+      # jerick_baseline:
+      #   POOL: jerick-normal
+      #   BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
+      # jerick_yc:
+      #   POOL: jerick-normal
+      #   BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
+      #   CACHE_YARN: FILES
+      # jerick_yc_tar:
+      #   POOL: jerick-normal
+      #   BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
+      #   CACHE_YARN: TAR
+      # jerick_nm:
+      #   POOL: jerick-normal
+      #   BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
+      #   CACHE_NODE_MODULES: FILES
+      # jerick_nm_tar:
+      #   POOL: jerick-normal
+      #   BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
+      #   CACHE_NODE_MODULES: TAR
+      # jerick_yc_nm:
+      #   POOL: jerick-normal
+      #   BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
+      #   CACHE_YARN: FILES
+      #   CACHE_NODE_MODULES: FILES
+      # jerick_yctar_nmtar:
+      #   POOL: jerick-normal
+      #   BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
+      #   CACHE_YARN: TAR
+      #   CACHE_NODE_MODULES: TAR
   pool:
-    vmImage: VS2017-Win2016
+    name: $(POOL)
   steps:
   - template: build/azure-pipelines/win32/continuous-build-win32.yml
 
@@ -27,11 +100,11 @@ jobs:
   steps:
   - template: build/azure-pipelines/win32/continuous-build-win32.yml
 
-- job: Linux
-  pool:
-    vmImage: 'Ubuntu-16.04'
-  steps:
-  - template: build/azure-pipelines/linux/continuous-build-linux.yml
+# - job: Linux
+#   pool:
+#     vmImage: 'Ubuntu-16.04'
+#   steps:
+#   - template: build/azure-pipelines/linux/continuous-build-linux.yml
 
 # - job: macOS
 #   pool:

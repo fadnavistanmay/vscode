@@ -9,6 +9,30 @@ steps:
 #   inputs:
 #     versionSpec: '2.x'
 #     addToPath: true
+- bash: |
+    echo "##vso[task.setvariable variable=BASH_ROOT]$(pwd)"
+  displayName: set BASH_ROOT
+
+- bash: |
+    echo System.DefaultWorkingDirectory=$(System.DefaultWorkingDirectory)
+    echo SYSTEM_DEFAULTWORKINGDIRECTORY=$SYSTEM_DEFAULTWORKINGDIRECTORY
+    echo Pipeline.Workspace=$(Pipeline.Workspace)
+    echo PIPELINE_WORKSPACE=$PIPELINE_WORKSPACE
+    echo MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
+    echo YARN_CACHE_FOLDER=$(YARN_CACHE_FOLDER)
+    echo BASH_YARN_CACHE_FOLDER=$(BASH_YARN_CACHE_FOLDER)
+    echo POOL=$(POOL)
+    echo CACHE_YARN=$(CACHE_YARN)
+    echo CACHE_NODE_MODULES=$(CACHE_NODE_MODULES)
+    printenv
+  displayName: info
+  condition: always()
+
+- bash: |
+    if [ -d $(BASH_YARN_CACHE_FOLDER) ]; then rm -Rf $(BASH_YARN_CACHE_FOLDER); fi
+    if [ -d $(BASH_ROOT)/node_modules ]; then rm -Rf $(BASH_ROOT)/node_modules; fi
+  displayName: precleanup
+  condition: always()
 
 - task: RestoreCache@0
   inputs:
@@ -17,6 +41,7 @@ steps:
       $(Agent.OS)
       $(Agent.JobName)
       CACHE_NODE_MODULES=$(CACHE_NODE_MODULES)
+      MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
     path: 'node_modules'
     cacheHitVar: 'CacheRestoredNodeModules'
   condition: and(succeeded(), eq(variables['CACHE_NODE_MODULES'], 'FILES'))
@@ -28,16 +53,18 @@ steps:
       $(Agent.OS)
       $(Agent.JobName)
       CACHE_NODE_MODULES=$(CACHE_NODE_MODULES)
-    path: 'PACKED_NODE_MODULES'
+      MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
+    path: '$(System.DefaultWorkingDirectory)/PACKED_NODE_MODULES'
     cacheHitVar: 'CacheRestoredNodeModulesTar'
   condition: and(succeeded(), eq(variables['CACHE_NODE_MODULES'], 'TAR'))
 - bash: |
     set -x
-    mkdir node_modules
-    cd node_modules
-    tar -xf ../PACKED_NODE_MODULES/packed.tar
-    cd ..
-    rm -Rf ./PACKED_NODE_MODULES
+    ls -l $(BASH_ROOT)/PACKED_NODE_MODULES
+    mkdir $(BASH_ROOT)/node_modules
+    cd $(BASH_ROOT)/node_modules
+    tar -xf $(BASH_ROOT)/PACKED_NODE_MODULES/packed.tar
+    ls -l
+    rm -Rf $(BASH_ROOT)/PACKED_NODE_MODULES
   condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], 'TAR'), eq(variables['PipelineCache.CacheRestoredNodeModulesTar'], 'True')))
 
 - task: RestoreCache@0
@@ -47,14 +74,47 @@ steps:
       $(Agent.OS)
       $(Agent.JobName)
       CACHE_YARN=$(CACHE_YARN)
+      MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
     path: '$(YARN_CACHE_FOLDER)'
     cacheHitVar: 'CacheRestoredYarnCache'
   condition: and(succeeded(), eq(variables['CACHE_YARN'], 'FILES'))
 
+- task: RestoreCache@0
+  inputs:
+    key: |
+      $(System.DefaultWorkingDirectory)/yarn.lock
+      $(Agent.OS)
+      $(Agent.JobName)
+      CACHE_YARN=$(CACHE_YARN)
+      MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
+      TIMES_FIXED_IN_YAML=1
+    path: '$(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER'
+    cacheHitVar: 'CacheRestoredYarnCacheTar'
+  condition: and(succeeded(), eq(variables['CACHE_YARN'], 'TAR'))
+- bash: |
+    set -x
+    ls -l $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
+    mkdir $(BASH_YARN_CACHE_FOLDER)
+    cd $(BASH_YARN_CACHE_FOLDER)
+    tar -xf $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER/packed.tar
+    ls -l
+    rm -Rf $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
+  condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'TAR'), eq(variables['PipelineCache.CacheRestoredYarnCacheTar'], 'True')))
+
+- bash: |
+    if [ -d $(BASH_YARN_CACHE_FOLDER) ]; then find $(BASH_YARN_CACHE_FOLDER); else echo $(BASH_YARN_CACHE_FOLDER) not found; fi
+    if [ -d $(BASH_ROOT)/node_modules ]; then find $(BASH_ROOT)/node_modules; else echo $(BASH_ROOT)/node_modules not found; fi
+  displayName: Check folder before
+
 - powershell: |
-    yarn --verbose
+    yarn --verbose --frozen-lockfile
   displayName: Install Dependencies
   #condition: and(succeeded(), ne(variables['PipelineCache.CacheRestored'], 'True'))
+
+- bash: |
+    if [ -d $(BASH_YARN_CACHE_FOLDER) ]; then find $(BASH_YARN_CACHE_FOLDER); else echo $(BASH_YARN_CACHE_FOLDER) not found; fi
+    if [ -d $(BASH_ROOT)/node_modules ]; then find $(BASH_ROOT)/node_modules; else echo $(BASH_ROOT)/node_modules not found; fi
+  displayName: Check folders after
 
 - task: SaveCache@0
   inputs:
@@ -63,14 +123,17 @@ steps:
       $(Agent.OS)
       $(Agent.JobName)
       CACHE_NODE_MODULES=$(CACHE_NODE_MODULES)
+      MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
     path: 'node_modules'
   condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], 'FILES'), ne(variables['PipelineCache.CacheRestoredNodeModules'], 'True')))
 
 - bash: |
     set -x
-    mkdir PACKED_NODE_MODULES
-    cd node_modules
-    tar -cf ../PACKED_NODE_MODULES/packed.tar *
+    mkdir $(BASH_ROOT)/PACKED_NODE_MODULES
+    cd $(BASH_ROOT)/node_modules
+    ls
+    tar -cf $(BASH_ROOT)/PACKED_NODE_MODULES/packed.tar .
+    ls -l $(BASH_ROOT)/PACKED_NODE_MODULES
   condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], 'TAR'), ne(variables['PipelineCache.CacheRestoredNodeModulesTar'], 'True')))
 - task: SaveCache@0
   inputs:
@@ -79,10 +142,11 @@ steps:
       $(Agent.OS)
       $(Agent.JobName)
       CACHE_NODE_MODULES=$(CACHE_NODE_MODULES)
+      MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
     path: 'PACKED_NODE_MODULES'
   condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], 'TAR'), ne(variables['PipelineCache.CacheRestoredNodeModulesTar'], 'True')))
 - bash: |
-    rm -Rf ./PACKED_NODE_MODULES
+    rm -Rf $(BASH_ROOT)/PACKED_NODE_MODULES
   condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], 'TAR'), ne(variables['PipelineCache.CacheRestoredNodeModulesTar'], 'True')))
 
 - task: SaveCache@0
@@ -92,10 +156,38 @@ steps:
       $(Agent.OS)
       $(Agent.JobName)
       CACHE_YARN=$(CACHE_YARN)
+      MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
     path: '$(YARN_CACHE_FOLDER)'
   condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'FILES'), ne(variables['PipelineCache.CacheRestoredYarnCache'], 'True')))
 
+- bash: |
+    set -x
+    mkdir $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
+    cd $(BASH_YARN_CACHE_FOLDER)
+    ls
+    tar -cf $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER/packed.tar .
+    ls -l $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
+  condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'TAR'), ne(variables['PipelineCache.CacheRestoredYarnCacheTar'], 'True')))
+- task: SaveCache@0
+  inputs:
+    key: |
+      $(System.DefaultWorkingDirectory)/yarn.lock
+      $(Agent.OS)
+      $(Agent.JobName)
+      CACHE_YARN=$(CACHE_YARN)
+      MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
+      TIMES_FIXED_IN_YAML=1
+    path: '$(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER'
+  condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'TAR'), ne(variables['PipelineCache.CacheRestoredYarnCacheTar'], 'True')))
+- bash: |
+    rm -Rf $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
+  condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'TAR'), ne(variables['PipelineCache.CacheRestoredYarnCacheTar'], 'True')))
 
+- bash: |
+    if [ -d $(BASH_YARN_CACHE_FOLDER) ]; then rm -Rf $(BASH_YARN_CACHE_FOLDER); fi
+    if [ -d $(BASH_ROOT)/node_modules ]; then rm -Rf $(BASH_ROOT)/node_modules; fi
+  displayName: cleanup
+  condition: always()
 
 # - powershell: |
 #     yarn gulp electron
