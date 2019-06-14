@@ -12,6 +12,18 @@ steps:
 - bash: |
     echo "##vso[task.setvariable variable=BASH_ROOT]$(pwd)"
   displayName: set BASH_ROOT
+
+- bash: |
+    echo MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
+    echo YARN_CACHE_FOLDER=$(YARN_CACHE_FOLDER)
+    echo BASH_YARN_CACHE_FOLDER=$(BASH_YARN_CACHE_FOLDER)
+    echo POOL=$(POOL)
+    echo CACHE_YARN=$(CACHE_YARN)
+    echo CACHE_NODE_MODULES=$(CACHE_NODE_MODULES)
+    printenv
+  displayName: info
+  condition: always()
+
 - bash: |
     if [ -d $(BASH_YARN_CACHE_FOLDER) ]; then rm -Rf $(BASH_YARN_CACHE_FOLDER); fi
     if [ -d $(BASH_ROOT)/node_modules ]; then rm -Rf $(BASH_ROOT)/node_modules; fi
