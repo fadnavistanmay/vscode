@@ -149,6 +149,10 @@ steps:
     rm -Rf $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
   condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'TAR'), ne(variables['PipelineCache.CacheRestoredYarnCacheTar'], 'True')))
 
+- bash: |
+    if [ -d $(BASH_YARN_CACHE_FOLDER) ]; then rm -Rf $(BASH_YARN_CACHE_FOLDER); fi
+  displayName: cleanup
+  condition: always()
 
 # - powershell: |
 #     yarn gulp electron

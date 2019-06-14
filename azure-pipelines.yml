@@ -5,7 +5,7 @@ jobs:
     RUN_SALT: 0
     YARN_CACHE_FOLDER: $(Pipeline.Workspace)/yarn-cache
     BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
-
+    IMAGE: VS2017-Win2016
   strategy:
     matrix:
       baseline: {}
@@ -24,8 +24,13 @@ jobs:
         CACHE_YARN: TAR
         CACHE_NODE_MODULES: TAR
         RUN_SALT: 1
+      linux_baseline:
+        IMAGE: Ubuntu-16.04
+      linux_nm:
+        CACHE_NODE_MODULES: FILES
+        IMAGE: Ubuntu-16.04
   pool:
-    vmImage: VS2017-Win2016
+    vmImage: $(IMAGE)
   steps:
   - template: build/azure-pipelines/win32/continuous-build-win32.yml
 
@@ -35,11 +40,11 @@ jobs:
 #   steps:
 #   - template: build/azure-pipelines/win32/continuous-build-win32.yml
 
-- job: Linux
-  pool:
-    vmImage: 'Ubuntu-16.04'
-  steps:
-  - template: build/azure-pipelines/linux/continuous-build-linux.yml
+# - job: Linux
+#   pool:
+#     vmImage: 'Ubuntu-16.04'
+#   steps:
+#   - template: build/azure-pipelines/linux/continuous-build-linux.yml
 
 # - job: macOS
 #   pool:
