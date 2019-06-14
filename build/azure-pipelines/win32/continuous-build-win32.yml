@@ -98,7 +98,7 @@ steps:
     cd $(BASH_YARN_CACHE_FOLDER)
     tar -xf $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER/packed.tar
     ls -l
-    rm -Rf $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
+    #rm -Rf $(BASH_ROOT)/PACKED_YARN_CACHE_FOLDER
   condition: and(succeeded(), and(eq(variables['CACHE_YARN'], 'TAR'), eq(variables['PipelineCache.CacheRestoredYarnCacheTar'], 'True')))
 
 - bash: |
