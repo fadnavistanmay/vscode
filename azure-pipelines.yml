@@ -61,7 +61,7 @@ jobs:
         CACHE_NODE_MODULES: TAR
 
       mac_baseline:
-        POOL: macos-10.13
+        POOL: Hosted MacOS
 
       # jerick_baseline:
       #   POOL: jerick-normal
