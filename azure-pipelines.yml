@@ -26,6 +26,10 @@ jobs:
         POOL: Hosted VS2017
         BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
         CACHE_NODE_MODULES: TAR
+      nm_7z:
+        POOL: Hosted VS2017
+        BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
+        CACHE_NODE_MODULES: 7z
       yc_nm:
         POOL: Hosted VS2017
         BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache

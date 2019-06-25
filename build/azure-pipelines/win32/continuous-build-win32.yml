@@ -73,6 +73,27 @@ steps:
       $(System.DefaultWorkingDirectory)/yarn.lock
       $(Agent.OS)
       $(Agent.JobName)
+      CACHE_NODE_MODULES=$(CACHE_NODE_MODULES)
+      MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
+    path: '$(System.DefaultWorkingDirectory)/PACKED_NODE_MODULES'
+    cacheHitVar: 'CacheRestoredNodeModules7z'
+  condition: and(succeeded(), eq(variables['CACHE_NODE_MODULES'], '7z'))
+- bash: |
+    set -x
+    ls -l $(BASH_ROOT)/PACKED_NODE_MODULES
+    mkdir $(BASH_ROOT)/node_modules
+    cd $(BASH_ROOT)/node_modules
+    7z a nm.zip $(BASH_ROOT)/PACKED_NODE_MODULES/
+    ls -l
+    rm -Rf $(BASH_ROOT)/PACKED_NODE_MODULES
+  condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], '7z'), eq(variables['PipelineCache.CacheRestoredNodeModules7z'], 'True')))
+
+- task: RestoreCache@0
+  inputs:
+    key: |
+      $(System.DefaultWorkingDirectory)/yarn.lock
+      $(Agent.OS)
+      $(Agent.JobName)
       CACHE_YARN=$(CACHE_YARN)
       MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
     path: '$(YARN_CACHE_FOLDER)'
