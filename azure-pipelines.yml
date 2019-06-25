@@ -60,6 +60,9 @@ jobs:
         CACHE_YARN: TAR
         CACHE_NODE_MODULES: TAR
 
+      mac_baseline:
+        POOL: macos-10.13
+
       # jerick_baseline:
       #   POOL: jerick-normal
       #   BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
