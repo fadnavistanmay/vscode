@@ -73,7 +73,7 @@ steps:
       $(System.DefaultWorkingDirectory)/yarn.lock
       $(Agent.OS)
       $(Agent.JobName)
-      TIMES_FIXED=4
+      TIMES_FIXED=5
       CACHE_NODE_MODULES=$(CACHE_NODE_MODULES)
       MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
     path: '$(System.DefaultWorkingDirectory)/PACKED_NODE_MODULES'
@@ -185,7 +185,7 @@ steps:
       $(System.DefaultWorkingDirectory)/yarn.lock
       $(Agent.OS)
       $(Agent.JobName)
-      TIMES_FIXED=4
+      TIMES_FIXED=5
       CACHE_NODE_MODULES=$(CACHE_NODE_MODULES)
       MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
     path: 'PACKED_NODE_MODULES'
