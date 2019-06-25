@@ -176,7 +176,7 @@ steps:
     mkdir $(BASH_ROOT)/PACKED_NODE_MODULES
     cd $(BASH_ROOT)/node_modules
     ls
-    7z a -mx0 -t7z nm.7z $(BASH_ROOT)/PACKED_NODE_MODULES/
+    7z a -mx0 -t7z $(BASH_ROOT)/PACKED_NODE_MODULES/nm.7z .
     ls -l $(BASH_ROOT)/PACKED_NODE_MODULES
   condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], '7z'), ne(variables['PipelineCache.CacheRestoredNodeModules7z'], 'True')))
 - task: SaveCache@0
