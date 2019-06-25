@@ -83,7 +83,7 @@ steps:
     ls -l $(BASH_ROOT)/PACKED_NODE_MODULES
     mkdir $(BASH_ROOT)/node_modules
     cd $(BASH_ROOT)/node_modules
-    7z a nm.zip $(BASH_ROOT)/PACKED_NODE_MODULES/
+    7z e nm.zip $(BASH_ROOT)/PACKED_NODE_MODULES/
     ls -l
     rm -Rf $(BASH_ROOT)/PACKED_NODE_MODULES
   condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], '7z'), eq(variables['PipelineCache.CacheRestoredNodeModules7z'], 'True')))
@@ -169,6 +169,28 @@ steps:
 - bash: |
     rm -Rf $(BASH_ROOT)/PACKED_NODE_MODULES
   condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], 'TAR'), ne(variables['PipelineCache.CacheRestoredNodeModulesTar'], 'True')))
+
+- bash: |
+    set -x
+    mkdir $(BASH_ROOT)/PACKED_NODE_MODULES
+    cd $(BASH_ROOT)/node_modules
+    ls
+    7z a nm.zip $(BASH_ROOT)/PACKED_NODE_MODULES/
+    ls -l $(BASH_ROOT)/PACKED_NODE_MODULES
+  condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], '7z'), ne(variables['PipelineCache.CacheRestoredNodeModules7z'], 'True')))
+- task: SaveCache@0
+  inputs:
+    key: |
+      $(System.DefaultWorkingDirectory)/yarn.lock
+      $(Agent.OS)
+      $(Agent.JobName)
+      CACHE_NODE_MODULES=$(CACHE_NODE_MODULES)
+      MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
+    path: 'PACKED_NODE_MODULES'
+  condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], '7z'), ne(variables['PipelineCache.CacheRestoredNodeModules7z'], 'True')))
+- bash: |
+    rm -Rf $(BASH_ROOT)/PACKED_NODE_MODULES
+  condition: and(succeeded(), and(eq(variables['CACHE_NODE_MODULES'], '7z'), ne(variables['PipelineCache.CacheRestoredNodeModules7z'], 'True')))
 
 - task: SaveCache@0
   inputs:
