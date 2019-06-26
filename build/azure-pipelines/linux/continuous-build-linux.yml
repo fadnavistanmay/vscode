@@ -27,10 +27,12 @@ steps:
   inputs:
     versionSpec: "1.10.1"
 - script: |
-    yarn
+    yarn --frozen-lockfile
   displayName: Install Dependencies
   condition: and(succeeded(), ne(variables['PipelineCache.CacheRestored'], 'True'))
 - task: SaveCache@0
+  condition: and(succeeded(), ne(variables['CacheRestored'], 'true'))
+- task: 1ESLighthouseEng.PipelineArtifactCaching.SaveCacheV1.SaveCache@1
   inputs:
     key: |
       $(System.DefaultWorkingDirectory)/yarn.lock

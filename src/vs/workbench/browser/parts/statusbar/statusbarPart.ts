@@ -543,20 +543,9 @@ export class StatusbarPart extends Part implements IStatusbarService {
 	private getContextMenuActions(event: StandardMouseEvent): IAction[] {
 		const actions: Action[] = [];
 
-		// Figure out if mouse is over an entry
-		let statusEntryUnderMouse: IStatusbarViewModelEntry | undefined = undefined;
-		for (let element: HTMLElement | null = event.target; element; element = element.parentElement) {
-			const entry = this.viewModel.findEntry(element);
-			if (entry) {
-				statusEntryUnderMouse = entry;
-				break;
-			}
-		}
-
-		if (statusEntryUnderMouse) {
-			actions.push(new HideStatusbarEntryAction(statusEntryUnderMouse.id, this.viewModel));
-			actions.push(new Separator());
-		}
+		// Provide an action to hide the status bar at last
+		actions.push(this.instantiationService.createInstance(ToggleStatusbarVisibilityAction, ToggleStatusbarVisibilityAction.ID, nls.localize('hideStatusBar', "Hide Status Bar")));
+		actions.push(new Separator());
 
 		// Show an entry per known status entry
 		// Note: even though entries have an identifier, there can be multiple entries
@@ -570,9 +559,20 @@ export class StatusbarPart extends Part implements IStatusbarService {
 			}
 		});
 
-		// Provide an action to hide the status bar at last
-		actions.push(new Separator());
-		actions.push(this.instantiationService.createInstance(ToggleStatusbarVisibilityAction, ToggleStatusbarVisibilityAction.ID, nls.localize('hideStatusBar', "Hide Status Bar")));
+		// Figure out if mouse is over an entry
+		let statusEntryUnderMouse: IStatusbarViewModelEntry | undefined = undefined;
+		for (let element: HTMLElement | null = event.target; element; element = element.parentElement) {
+			const entry = this.viewModel.findEntry(element);
+			if (entry) {
+				statusEntryUnderMouse = entry;
+				break;
+			}
+		}
+
+		if (statusEntryUnderMouse) {
+			actions.push(new Separator());
+			actions.push(new HideStatusbarEntryAction(statusEntryUnderMouse.id, this.viewModel));
+		}
 
 		return actions;
 	}
@@ -604,6 +604,7 @@ export class StatusbarPart extends Part implements IStatusbarService {
 	private doCreateStatusItem(id: string, name: string, alignment: StatusbarAlignment, priority: number = 0, ...extraClasses: string[]): HTMLElement {
 		const itemContainer = document.createElement('div');
 		itemContainer.title = name;
+		itemContainer.id = id;
 
 		addClass(itemContainer, 'statusbar-item');
 		if (extraClasses) {
@@ -660,6 +661,7 @@ class StatusbarEntryItem extends Disposable {
 
 		// Label Container
 		this.labelContainer = document.createElement('a');
+		this.labelContainer.tabIndex = -1; // allows screen readers to read title, but still prevents tab focus.
 
 		// Label
 		this.label = new OcticonLabel(this.labelContainer);
@@ -717,7 +719,7 @@ class StatusbarEntryItem extends Disposable {
 			this.applyColor(this.labelContainer, entry.color);
 		}
 
-		// Update: Backgroud
+		// Update: Background
 		if (!this.entry || entry.backgroundColor !== this.entry.backgroundColor) {
 			if (entry.backgroundColor) {
 				this.applyColor(this.container, entry.backgroundColor, true);

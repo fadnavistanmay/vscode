@@ -151,6 +151,10 @@ steps:
   displayName: Check folders after
 
 - task: SaveCache@0
+    yarn --frozen-lockfile
+  displayName: Install Dependencies
+  condition: and(succeeded(), ne(variables['CacheRestored'], 'true'))
+- task: 1ESLighthouseEng.PipelineArtifactCaching.SaveCacheV1.SaveCache@1
   inputs:
     key: |
       $(System.DefaultWorkingDirectory)/yarn.lock

@@ -3,13 +3,13 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { IDisposable, dispose, Disposable } from 'vs/base/common/lifecycle';
+import { Disposable, DisposableStore } from 'vs/base/common/lifecycle';
 import { Event, Emitter } from 'vs/base/common/event';
 import { EventType, addDisposableListener, addClass, removeClass, isAncestor, getClientArea, position, size, EventHelper } from 'vs/base/browser/dom';
 import { onDidChangeFullscreen, isFullscreen, getZoomFactor } from 'vs/base/browser/browser';
 import { IBackupFileService } from 'vs/workbench/services/backup/common/backup';
 import { Registry } from 'vs/platform/registry/common/platform';
-import { isWindows, isLinux, isMacintosh, isWeb } from 'vs/base/common/platform';
+import { isWindows, isLinux, isMacintosh, isWeb, isNative } from 'vs/base/common/platform';
 import { pathsToEditors } from 'vs/workbench/common/editor';
 import { SidebarPart } from 'vs/workbench/browser/parts/sidebar/sidebarPart';
 import { PanelPart } from 'vs/workbench/browser/parts/panel/panelPart';
@@ -45,8 +45,6 @@ enum Settings {
 
 	ZEN_MODE_RESTORE = 'zenMode.restore',
 
-	// TODO @misolori remove before shipping stable
-	ICON_EXPLORATION_ENABLED = 'workbench.iconExploration.enabled'
 }
 
 enum Storage {
@@ -159,13 +157,9 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 			transitionedToCenteredEditorLayout: false,
 			wasSideBarVisible: false,
 			wasPanelVisible: false,
-			transitionDisposeables: [] as IDisposable[]
-		},
-
-		// TODO @misolori remove before shipping stable
-		iconExploration: {
-			enabled: false
+			transitionDisposeables: new DisposableStore()
 		}
+
 	};
 
 	constructor(
@@ -229,7 +223,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 		}
 
 		// Menubar visibility changes
-		if ((isWindows || isLinux) && getTitleBarStyle(this.configurationService, this.environmentService) === 'custom') {
+		if ((isWindows || isLinux || isWeb) && getTitleBarStyle(this.configurationService, this.environmentService) === 'custom') {
 			this._register(this.titleService.onMenubarVisibilityChange(visible => this.onMenubarToggled(visible)));
 		}
 	}
@@ -298,11 +292,6 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 		// Menubar visibility
 		const newMenubarVisibility = this.configurationService.getValue<MenuBarVisibility>(Settings.MENUBAR_VISIBLE);
 		this.setMenubarVisibility(newMenubarVisibility, !!skipLayout);
-
-		// TODO @misolori remove before shipping stable
-		// Icon exploration on setting change
-		const newIconExplorationEnabled = this.configurationService.getValue<boolean>(Settings.ICON_EXPLORATION_ENABLED);
-		this.setIconExploration(newIconExplorationEnabled);
 
 	}
 
@@ -417,10 +406,6 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 		// Zen mode enablement
 		this.state.zenMode.restore = this.storageService.getBoolean(Storage.ZEN_MODE_ENABLED, StorageScope.WORKSPACE, false) && this.configurationService.getValue(Settings.ZEN_MODE_RESTORE);
 
-		// TODO @misolori remove before shipping stable
-		// Icon exploration
-		this.state.iconExploration.enabled = this.configurationService.getValue<boolean>(Settings.ICON_EXPLORATION_ENABLED);
-		this.setIconExploration(this.state.iconExploration.enabled);
 	}
 
 	private resolveEditorsToOpen(fileService: IFileService): Promise<IResourceEditor[]> | IResourceEditor[] {
@@ -535,7 +520,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 					return false;
 				} else if (!this.state.fullscreen) {
 					return true;
-				} else if (isMacintosh) {
+				} else if (isMacintosh && isNative) {
 					return false;
 				} else if (this.state.menuBar.visibility === 'visible') {
 					return true;
@@ -582,7 +567,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 
 	toggleZenMode(skipLayout?: boolean, restoring = false): void {
 		this.state.zenMode.active = !this.state.zenMode.active;
-		this.state.zenMode.transitionDisposeables = dispose(this.state.zenMode.transitionDisposeables);
+		this.state.zenMode.transitionDisposeables.clear();
 
 		const setLineNumbers = (lineNumbers: any) => this.editorService.visibleTextEditorWidgets.forEach(editor => editor.updateOptions({ lineNumbers }));
 
@@ -621,11 +606,11 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 
 			if (config.hideLineNumbers) {
 				setLineNumbers('off');
-				this.state.zenMode.transitionDisposeables.push(this.editorService.onDidVisibleEditorsChange(() => setLineNumbers('off')));
+				this.state.zenMode.transitionDisposeables.add(this.editorService.onDidVisibleEditorsChange(() => setLineNumbers('off')));
 			}
 
 			if (config.hideTabs && this.editorGroupService.partOptions.showTabs) {
-				this.state.zenMode.transitionDisposeables.push(this.editorGroupService.enforcePartOptions({ showTabs: false }));
+				this.state.zenMode.transitionDisposeables.add(this.editorGroupService.enforcePartOptions({ showTabs: false }));
 			}
 
 			if (config.centerLayout) {
@@ -687,19 +672,6 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 				this.workbenchGrid.layout();
 			}
 		}
-	}
-
-	// TODO @misolori remove before shipping stable
-	private setIconExploration(enabled: boolean): void {
-		this.state.iconExploration.enabled = enabled;
-
-		// Update DOM
-		if (enabled) {
-			document.body.dataset.exploration = 'icon-exploration';
-		} else {
-			document.body.dataset.exploration = '';
-		}
-
 	}
 
 	protected createWorkbenchLayout(instantiationService: IInstantiationService): void {

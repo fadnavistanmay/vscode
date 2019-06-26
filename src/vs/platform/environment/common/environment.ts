@@ -13,6 +13,7 @@ export interface ParsedArgs {
 	_urls?: string[];
 	help?: boolean;
 	version?: boolean;
+	telemetry?: boolean;
 	status?: boolean;
 	wait?: boolean;
 	waitMarkerFilePath?: string;
@@ -64,11 +65,12 @@ export interface ParsedArgs {
 	'max-memory'?: string;
 	'file-write'?: boolean;
 	'file-chmod'?: boolean;
-	'upload-logs'?: string;
 	'driver'?: string;
 	'driver-verbose'?: boolean;
 	remote?: string;
 	'disable-user-env-probe'?: boolean;
+	'enable-remote-auto-shutdown'?: boolean;
+	'disable-inspect'?: boolean;
 }
 
 export const IEnvironmentService = createDecorator<IEnvironmentService>('environmentService');
@@ -99,6 +101,7 @@ export interface IEnvironmentService {
 	appSettingsHome: URI;
 	settingsResource: URI;
 	keybindingsResource: URI;
+	keyboardLayoutResource: URI;
 
 	machineSettingsHome: URI;
 	machineSettingsResource: URI;
@@ -151,4 +154,7 @@ export interface IEnvironmentService {
 
 	driverHandle?: string;
 	driverVerbose: boolean;
+
+	webviewEndpoint?: string;
+	readonly webviewResourceRoot: string;
 }

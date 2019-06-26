@@ -218,22 +218,29 @@ export class FilesRenderer implements ITreeRenderer<ExplorerItem, FuzzyScore, IF
 		const lastDot = value.lastIndexOf('.');
 
 		inputBox.value = value;
-		inputBox.focus();
-		inputBox.select({ start: 0, end: lastDot > 0 && !stat.isDirectory ? lastDot : value.length });
 
-		const done = once(async (success: boolean, finishEditing: boolean) => {
+		let isFinishableDisposeEvent = false;
+		setTimeout(() => {
+			// Check if disposed
+			if (!inputBox.inputElement) {
+				return;
+			}
+			inputBox.focus();
+			inputBox.select({ start: 0, end: lastDot > 0 && !stat.isDirectory ? lastDot : value.length });
+			isFinishableDisposeEvent = true;
+		}, 0);
+
+		const done = once(async (success: boolean) => {
 			label.element.style.display = 'none';
 			const value = inputBox.value;
 			dispose(toDispose);
-			container.removeChild(label.element);
-			if (finishEditing) {
-				// Timeout: once done rendering only then re-render #70902
-				setTimeout(() => editableData.onFinish(value, success), 0);
-			}
+			label.element.remove();
+			// Timeout: once done rendering only then re-render #70902
+			setTimeout(() => editableData.onFinish(value, success), 0);
 		});
 
 		const blurDisposable = DOM.addDisposableListener(inputBox.inputElement, DOM.EventType.BLUR, () => {
-			done(inputBox.isInputValid(), true);
+			done(inputBox.isInputValid());
 		});
 
 		const toDispose = [
@@ -241,10 +248,10 @@ export class FilesRenderer implements ITreeRenderer<ExplorerItem, FuzzyScore, IF
 			DOM.addStandardDisposableListener(inputBox.inputElement, DOM.EventType.KEY_DOWN, (e: IKeyboardEvent) => {
 				if (e.equals(KeyCode.Enter)) {
 					if (inputBox.validate()) {
-						done(true, true);
+						done(true);
 					}
 				} else if (e.equals(KeyCode.Escape)) {
-					done(false, true);
+					done(false);
 				}
 			}),
 			blurDisposable,
@@ -253,8 +260,13 @@ export class FilesRenderer implements ITreeRenderer<ExplorerItem, FuzzyScore, IF
 		];
 
 		return toDisposable(() => {
-			blurDisposable.dispose();
-			done(false, false);
+			if (isFinishableDisposeEvent) {
+				done(false);
+			}
+			else {
+				dispose(toDispose);
+				label.element.remove();
+			}
 		});
 	}
 
@@ -484,7 +496,7 @@ export class FileDragAndDrop implements ITreeDragAndDrop<ExplorerItem> {
 			const items = (data as ElementsDragAndDropData<ExplorerItem>).elements;
 
 			if (!target) {
-				// Droping onto the empty area. Do not accept if items dragged are already
+				// Dropping onto the empty area. Do not accept if items dragged are already
 				// children of the root unless we are copying the file
 				if (!isCopy && items.every(i => !!i.parent && i.parent.isRoot)) {
 					return false;
@@ -614,26 +626,24 @@ export class FileDragAndDrop implements ITreeDragAndDrop<ExplorerItem> {
 		const folders = result.filter(r => r.success && r.stat && r.stat.isDirectory).map(result => ({ uri: result.stat!.resource }));
 		if (folders.length > 0) {
 
-			// If we are in no-workspace context, ask for confirmation to create a workspace
+			const buttons = [
+				folders.length > 1 ? localize('copyFolders', "&&Copy Folders") : localize('copyFolder', "&&Copy Folder"),
+				localize('cancel', "Cancel")
+			];
 			const workspaceFolderSchemas = this.contextService.getWorkspace().folders.map(f => f.uri.scheme);
-			let choice: number;
-			if (folders.some(f => workspaceFolderSchemas.indexOf(f.uri.scheme) === -1)) {
-				// We do not allow to add folders
-				choice = 1;
-			} else {
-				choice = await this.dialogService.show(Severity.Info, folders.length > 1 ? localize('dropFolders', "Do you want to copy the folders or add the folders to the workspace?")
-					: localize('dropFolder', "Do you want to copy the folder or add the folder to the workspace?"),
-					[
-						folders.length > 1 ? localize('addFolders', "&&Add Folders to Workspace") : localize('addFolder', "&&Add Folder to Workspace"),
-						folders.length > 1 ? localize('copyFolders', "&&Copy Folders") : localize('copyFolder', "&&Copy Folder"),
-						localize('cancel', "Cancel")
-					]
-				);
+			let message = folders.length > 1 ? localize('copyfolders', "Are you sure to want to copy folders?") : localize('copyfolder', "Are you sure to want to copy '{0}'?", basename(folders[0].uri));
+			if (folders.some(f => workspaceFolderSchemas.indexOf(f.uri.scheme) >= 0)) {
+				// We only allow to add a folder to the workspace if there is already a workspace folder with that scheme
+				buttons.unshift(folders.length > 1 ? localize('addFolders', "&&Add Folders to Workspace") : localize('addFolder', "&&Add Folder to Workspace"));
+				message = folders.length > 1 ? localize('dropFolders', "Do you want to copy the folders or add the folders to the workspace?")
+					: localize('dropFolder', "Do you want to copy '{0}' or add '{0}' as a folder to the workspace?", basename(folders[0].uri));
 			}
-			if (choice === 0) {
+
+			const choice = await this.dialogService.show(Severity.Info, message, buttons);
+			if (choice === buttons.length - 3) {
 				return this.workspaceEditingService.addFolders(folders);
 			}
-			if (choice === 1) {
+			if (choice === buttons.length - 2) {
 				return this.addResources(target, droppedResources.map(res => res.resource));
 			}
 

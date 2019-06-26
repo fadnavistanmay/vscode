@@ -113,7 +113,7 @@ class RequestOracle {
 		);
 
 		if (this._lastState && thisState.equals(this._lastState)) {
-			// prevent unneccesary changes...
+			// prevent unnecessary changes...
 			return;
 		}
 		dispose(this._sessionDisposable);
@@ -327,7 +327,7 @@ export class OutlinePanel extends ViewletPanel {
 				filterOnType: this._outlineViewState.filterOnType,
 				sorter: this._treeComparator,
 				identityProvider: new OutlineIdentityProvider(),
-				keyboardNavigationLabelProvider: this._instantiationService.createInstance(OutlineNavigationLabelProvider)
+				keyboardNavigationLabelProvider: new OutlineNavigationLabelProvider()
 			}
 		) as WorkbenchDataTree<OutlineModel, OutlineItem, FuzzyScore>;
 

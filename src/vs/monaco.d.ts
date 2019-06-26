@@ -1180,23 +1180,43 @@ declare namespace monaco.editor {
 	}
 
 	/**
-	 * Options for rendering a model decoration in the overview ruler.
+	 * Position in the minimap to render the decoration.
 	 */
-	export interface IModelDecorationOverviewRulerOptions {
+	export enum MinimapPosition {
+		Inline = 1
+	}
+
+	export interface IDecorationOptions {
 		/**
-		 * CSS color to render in the overview ruler.
+		 * CSS color to render.
 		 * e.g.: rgba(100, 100, 100, 0.5) or a color from the color registry
 		 */
 		color: string | ThemeColor | undefined;
 		/**
-		 * CSS color to render in the overview ruler.
+		 * CSS color to render.
 		 * e.g.: rgba(100, 100, 100, 0.5) or a color from the color registry
 		 */
 		darkColor?: string | ThemeColor;
+	}
+
+	/**
+	 * Options for rendering a model decoration in the overview ruler.
+	 */
+	export interface IModelDecorationOverviewRulerOptions extends IDecorationOptions {
 		/**
 		 * The position in the overview ruler.
 		 */
 		position: OverviewRulerLane;
+	}
+
+	/**
+	 * Options for rendering a model decoration in the overview ruler.
+	 */
+	export interface IModelDecorationMinimapOptions extends IDecorationOptions {
+		/**
+		 * The position in the overview ruler.
+		 */
+		position: MinimapPosition;
 	}
 
 	/**
@@ -1233,6 +1253,10 @@ declare namespace monaco.editor {
 		 * If set, render this decoration in the overview ruler.
 		 */
 		overviewRuler?: IModelDecorationOverviewRulerOptions | null;
+		/**
+		 * If set, render this decoration in the minimap.
+		 */
+		minimap?: IModelDecorationMinimapOptions | null;
 		/**
 		 * If set, the decoration will be rendered in the glyph margin with this CSS class name.
 		 */
@@ -4957,6 +4981,10 @@ declare namespace monaco.languages {
 		activeParameter: number;
 	}
 
+	export interface SignatureHelpResult extends IDisposable {
+		value: SignatureHelp;
+	}
+
 	export enum SignatureHelpTriggerKind {
 		Invoke = 1,
 		TriggerCharacter = 2,
@@ -4980,7 +5008,7 @@ declare namespace monaco.languages {
 		/**
 		 * Provide help for the signature at the given position and document.
 		 */
-		provideSignatureHelp(model: editor.ITextModel, position: Position, token: CancellationToken, context: SignatureHelpContext): ProviderResult<SignatureHelp>;
+		provideSignatureHelp(model: editor.ITextModel, position: Position, token: CancellationToken, context: SignatureHelpContext): ProviderResult<SignatureHelpResult>;
 	}
 
 	/**

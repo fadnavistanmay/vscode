@@ -339,7 +339,7 @@ export class Git {
 	}
 
 	async clone(url: string, parentPath: string, cancellationToken?: CancellationToken): Promise<string> {
-		let baseFolderName = decodeURI(url).replace(/^.*\//, '').replace(/\.git$/, '') || 'repository';
+		let baseFolderName = decodeURI(url).replace(/[\/]+$/, '').replace(/^.*\//, '').replace(/\.git$/, '') || 'repository';
 		let folderName = baseFolderName;
 		let folderPath = path.join(parentPath, folderName);
 		let count = 1;
@@ -371,8 +371,14 @@ export class Git {
 	}
 
 	async getRepositoryDotGit(repositoryPath: string): Promise<string> {
-		const result = await this.exec(repositoryPath, ['rev-parse', '--absolute-git-dir']);
-		return path.normalize(result.stdout.trim());
+		const result = await this.exec(repositoryPath, ['rev-parse', '--git-dir']);
+		let dotGitPath = result.stdout.trim();
+
+		if (!path.isAbsolute(dotGitPath)) {
+			dotGitPath = path.join(repositoryPath, dotGitPath);
+		}
+
+		return path.normalize(dotGitPath);
 	}
 
 	async exec(cwd: string, args: string[], options: SpawnOptions = {}): Promise<IExecutionResult<string>> {
