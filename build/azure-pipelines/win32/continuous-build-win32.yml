@@ -49,8 +49,8 @@ steps:
 - powershell: |
       cd $(System.DefaultWorkingDirectory)
       ls
-      displayname: Display
-      condition: and(succeeded(), eq(variables['CacheRestoredNodeModulesSingleFile'], 'True'))
+    displayname: Display
+    condition: and(succeeded(), eq(variables['CacheRestoredNodeModulesSingleFile'], 'True'))
 
 
 # - task: RestoreCache@0
