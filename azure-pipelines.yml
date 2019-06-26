@@ -31,7 +31,7 @@ jobs:
         BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
         CACHE_NODE_MODULES: 7z
       nm_SingleCache:
-        POOL: Hosted VS2017
+        POOL: tafadnav153
         BASH_YARN_CACHE_FOLDER: /d/a/1/yarn-cache
         CACHE_NODE_MODULES: SINGLEFILE
       yc_nm:
