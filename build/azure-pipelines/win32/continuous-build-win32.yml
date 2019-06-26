@@ -34,6 +34,18 @@ steps:
   displayName: precleanup
   condition: always()
 
+-task: Cache@2
+  inputs:
+    key: |
+      $(System.DefaultWorkingDirectory)/yarn.lock
+      $(Agent.OS)
+      $(Agent.JobName)
+      CACHE_NODE_MODULES=$(CACHE_NODE_MODULES)
+      MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
+    path: 'node_modules'
+    cacheHitVar: 'CacheRestoredNodeModulesSingleFile'
+  condition: and(succeeded(), eq(variables['CACHE_NODE_MODULES'], 'SINGLEFILE'))
+
 - task: RestoreCache@0
   inputs:
     key: |
