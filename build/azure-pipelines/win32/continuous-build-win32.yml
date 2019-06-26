@@ -49,7 +49,7 @@ steps:
 - powershell: |
       cd $(System.DefaultWorkingDirectory)
       ls
-  displayname: Display
+  displayName: Display
   #condition: and(succeeded(), eq(variables['CacheRestoredNodeModulesSingleFile'], 'True'))
 
 # - task: RestoreCache@0
