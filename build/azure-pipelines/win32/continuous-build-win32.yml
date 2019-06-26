@@ -42,7 +42,7 @@ steps:
       $(Agent.JobName)
       CACHE_NODE_MODULES=$(CACHE_NODE_MODULES)
       MATRIX_SALT=$(MATRIX_SALT) RUN_SALT=$(RUN_SALT)
-    path: 'node_modules'
+    path: 'C:\Users\tafadnav\TestFolder'
     cacheHitVar: 'CacheRestoredNodeModulesSingleFile'
   condition: and(succeeded(), eq(variables['CACHE_NODE_MODULES'], 'SINGLEFILE'))
 
