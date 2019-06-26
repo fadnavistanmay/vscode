@@ -5,10 +5,10 @@ steps:
 - task: geeklearningio.gl-vsts-tasks-yarn.yarn-installer-task.YarnInstaller@2
   inputs:
     versionSpec: "1.10.1"
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '2.x'
-    addToPath: true
+#- task: UsePythonVersion@0
+#  inputs:
+#    versionSpec: '2.x'
+#    addToPath: true
 - task: 1ESLighthouseEng.PipelineArtifactCaching.RestoreCacheV1.RestoreCache@1
   inputs:
     keyfile: '**/yarn.lock, !**/node_modules/**/yarn.lock, !**/.*/**/yarn.lock'
